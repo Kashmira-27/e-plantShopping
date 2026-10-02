@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ProductList.css';
 import CartItem from './CartItem';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItem } from './CartSlice';
 
 function ProductList({ onHomeClick }) {
@@ -10,6 +10,16 @@ function ProductList({ onHomeClick }) {
     const [addedToCart, setAddedToCart] = useState({});
 
     const dispatch = useDispatch();
+
+    // Get cart items from Redux store
+    const CartItems = useSelector(state => state.cart.items);
+
+    // Calculate total quantity of all items in the cart
+    const calculateTotalQuantity = () => {
+        return CartItems
+            ? CartItems.reduce((total, item) => total + item.quantity, 0)
+            : 0;
+    };
 
     const plantsArray = [
         {
@@ -344,6 +354,10 @@ function ProductList({ onHomeClick }) {
                                         id="mainIconPathAttribute"
                                     ></path>
                                 </svg>
+
+                                <span className="cart_quantity_count">
+                                    {calculateTotalQuantity()}
+                                </span>
                             </h1>
                         </a>
                     </div>
@@ -383,10 +397,15 @@ function ProductList({ onHomeClick }) {
                                         </div>
 
                                         <button
-                                            className="product-button"
+                                            className={`product-button ${
+                                                addedToCart[plant.name]
+                                                    ? 'added-to-cart'
+                                                    : ''
+                                            }`}
                                             onClick={() =>
                                                 handleAddToCart(plant)
                                             }
+                                            disabled={addedToCart[plant.name]}
                                         >
                                             {addedToCart[plant.name]
                                                 ? 'Added to Cart'
@@ -407,4 +426,4 @@ function ProductList({ onHomeClick }) {
     );
 }
 
-export default ProductList;
+export default ProductList; 
